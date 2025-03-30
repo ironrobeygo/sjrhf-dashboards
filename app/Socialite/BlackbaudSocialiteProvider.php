@@ -22,25 +22,21 @@ class BlackbaudSocialiteProvider extends AbstractProvider
 
     protected function getUserByToken($token)
     {
-        $response = $this->getHttpClient()->get(
-            'https://api.sky.blackbaud.com/constituent/v1/constituents/me',
-            [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$token,
-                    'Bb-Api-Subscription-Key' => config('services.blackbaud.subscription_key'),
-                ],
-            ]
-        );
-
-        return json_decode($response->getBody(), true);
-    }
+        return [
+            'id' => $token, // or a hash of it, if needed
+            'token' => $token,
+            'email' => null,
+            'name' => null,
+        ];
+    }    
 
     protected function mapUserToObject(array $user)
     {
-        return (new User())->setRaw($user)->map([
+        return (new \Laravel\Socialite\Two\User)->setRaw($user)->map([
             'id' => $user['id'],
-            'name' => $user['first']['value'] . ' ' . $user['last']['value'],
-            'email' => $user['email']['address'] ?? null,
+            'token' => $user['token'],
+            'name' => 'Blackbaud User',
+            'email' => 'user_' . md5($user['token']) . '@blackbaud.local',
         ]);
-    }
+    }    
 }

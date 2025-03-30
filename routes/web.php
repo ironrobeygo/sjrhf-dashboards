@@ -1,34 +1,38 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
-use Laravel\Socialite\Facades\Socialite;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
 
-Route::get('/', function () {
-    return view('welcome'); // or any valid Blade view
-});
+// Login route (required by auth middleware)
+Route::get('/login', function () {
+    return redirect()->route('auth.blackbaud');
+})->name('login');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth');
-
+// Start Blackbaud OAuth
 Route::get('/auth/blackbaud', function () {
     return Socialite::driver('blackbaud')->redirect();
 })->name('auth.blackbaud');
 
+// OAuth callback
 Route::get('/auth/blackbaud/callback', function () {
     $blackbaudUser = Socialite::driver('blackbaud')->stateless()->user();
 
+    // Use token to create a dummy user
     $user = User::firstOrCreate([
-        'email' => $blackbaudUser->getEmail(),
+        'email' => 'blackbaud_' . md5($blackbaudUser->token) . '@bb.fake',
     ], [
-        'name' => $blackbaudUser->getName() ?? 'Blackbaud User',
-        'password' => bcrypt(Str::random(16)), // dummy password
+        'name' => 'Blackbaud User',
+        'password' => bcrypt(Str::random(16)),
     ]);
 
     Auth::login($user);
 
     return redirect('/dashboard');
 });
+
+// Dashboard (protected)
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth']);
