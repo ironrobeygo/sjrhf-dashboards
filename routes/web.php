@@ -38,6 +38,10 @@ Route::get('/auth/blackbaud/callback', function () {
     return redirect('/dashboard');
 });
 
+Route::get('/', function () {
+    return redirect('/dashboard');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/upload', [DataController::class, 'uploadForm'])->name('upload.form');
     Route::post('/upload', [DataController::class, 'upload'])->name('upload.store');
