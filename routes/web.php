@@ -9,6 +9,7 @@ use App\Http\Controllers\DataController;
 use App\Http\Controllers\OpportunityController;
 use App\Http\Controllers\ProposalController;
 use App\Models\User;
+use App\Http\Controllers\ActionController;
 
 // Login route (required by auth middleware)
 Route::get('/login', function () {
@@ -41,13 +42,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/upload', [DataController::class, 'uploadForm'])->name('upload.form');
     Route::post('/upload', [DataController::class, 'upload'])->name('upload.store');
     
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/opportunities/{type}', [OpportunityController::class, 'type']);
     Route::get('/opportunities-details/{type}', [OpportunityController::class, 'typeDetails'])->name('opportunities.details');
     Route::get('/funded-opportunities', [OpportunityController::class, 'fundedOpportunity'])->name('opportunities.funded.details');
     Route::get('/open-opportunities-purpose/{purpose}', [OpportunityController::class, 'purposeDetails'])->name('open.opportunities.purpose.details');
     
-    
     Route::get('/proposal-summary/{status}', [ProposalController::class, 'summary']);
     Route::get('/open-proposals/{group}', [ProposalController::class, 'details'])->name('open.proposals.details');
+
+    Route::get('/actions/{fundraiser}/{category}', [ActionController::class, 'showFundraiserActionDetails']);
+    Route::get('/action-type/{fundraiser}/{type}', [ActionController::class, 'showFundraiserActionType']);
+
 });
