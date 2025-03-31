@@ -8,7 +8,7 @@ use App\Models\Opportunity;
 
 class OpportunityController extends Controller
 {
-    public function show($type)
+    public function type($type)
     {
         $cutoff = Carbon::now()->subMonths(12);
         $now = Carbon::now();
@@ -41,7 +41,7 @@ class OpportunityController extends Controller
                 $title = 'Unknown Opportunities';
         }
 
-        return view('opportunities.details', compact('records', 'title'));
+        return view('opportunities.type.details', compact('records', 'title'));
     }
 
     public function summary($status)
@@ -76,7 +76,7 @@ class OpportunityController extends Controller
         return view('opportunities.summary', compact('records', 'title'));
     }
 
-    public function details($type)
+    public function typeDetails($type)
     {
         $cutoff = Carbon::now()->subMonths(12);
         $now = Carbon::now();
@@ -91,6 +91,48 @@ class OpportunityController extends Controller
             abort(404, 'Opportunity type not found.');
         }
         
-        return view('opportunities.opportunity-details', compact('opportunities', 'title'));
+        return view('opportunities.details', compact('opportunities', 'title'));
+    }
+
+    public function fundedOpportunity(){
+        $fiscalDates = getFiscalYearDates(Carbon::now());
+
+        // Retrieve all funded opportunities within the current fiscal year
+        $fundedOpportunities = Opportunity::where('proposal_status', 'Funded/Closed')
+            ->whereNotNull('date_closed')
+            ->whereBetween('date_closed', [$fiscalDates['start'], $fiscalDates['end']])
+            ->get();
+
+        // Pass the data to the view for display
+        return view('opportunities.funded.details', [
+            'fundedOpportunities' => $fundedOpportunities,
+            'fiscalStart'         => $fiscalDates['start'],
+            'fiscalEnd'           => $fiscalDates['end'],
+        ]);
+    }
+
+    public function purposeDetails($purpose)
+    {
+        // Mapping: cleaned value => full purpose value
+        $purposeMapping = [
+            'sponsorship'       => 'Sponsorship',
+            'major'             => 'Major ($10k-$99k)',
+            'planned'           => 'Planned',
+            'transformational'  => 'Transformational ($1M+)',
+            'leadership'        => 'Leadership ($100k-$999k)',  // Adjust as stored
+            'mid-level'         => 'Mid-Level ($1k-$9,999)'
+        ];
+
+        $purpose = $purposeMapping[$purpose] ?? null;
+        if (!$purpose) {
+            abort(404, 'Purpose not found.');
+        }
+
+        // Retrieve all active opportunities with the given purpose
+        $opportunities = Opportunity::openProposals()
+            ->where('purpose', $purpose )
+            ->get();
+
+        return view('opportunities.open.purpose.details', compact('opportunities', 'purpose'));
     }
 }

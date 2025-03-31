@@ -10,6 +10,7 @@ use App\Http\Controllers\DataController;
 use App\Http\Controllers\OpportunityController;
 use App\Http\Controllers\OpenOpportunityController;
 use App\Http\Controllers\OpenProposalController;
+use App\Http\Controllers\ProposalController;
 // use App\Models\User;
 
 // // Login route (required by auth middleware)
@@ -48,9 +49,11 @@ Route::get('/upload', [DataController::class, 'uploadForm'])->name('upload.form'
 Route::post('/upload', [DataController::class, 'upload'])->name('upload.store');
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/funded-opportunities', [FundedOpportunityController::class, 'index'])->name('opportunities.funded.details');
-Route::get('/opportunities/{type}', [OpportunityController::class, 'show']);
-Route::get('/proposal-summary/{status}', [OpportunityController::class, 'summary']);
-Route::get('/open-opportunities-purpose/{purpose}', [OpenOpportunityController::class, 'details'])->name('open.opportunities.purpose.details');
-Route::get('/open-proposals/{group}', [OpenProposalController::class, 'details'])->name('open.proposals.details');
-Route::get('/opportunities-details/{type}', [OpportunityController::class, 'details'])->name('opportunities.details');
+Route::get('/opportunities/{type}', [OpportunityController::class, 'type']);
+Route::get('/opportunities-details/{type}', [OpportunityController::class, 'typeDetails'])->name('opportunities.details');
+Route::get('/funded-opportunities', [OpportunityController::class, 'fundedOpportunity'])->name('opportunities.funded.details');
+Route::get('/open-opportunities-purpose/{purpose}', [OpportunityController::class, 'purposeDetails'])->name('open.opportunities.purpose.details');
+
+
+Route::get('/proposal-summary/{status}', [ProposalController::class, 'summary']);
+Route::get('/open-proposals/{group}', [ProposalController::class, 'details'])->name('open.proposals.details');
