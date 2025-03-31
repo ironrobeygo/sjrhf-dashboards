@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Opportunity;
+use App\Models\Action;
 use Carbon\Carbon;
 
 class DataController extends Controller
@@ -21,35 +22,43 @@ class DataController extends Controller
 
         $file = $request->file('csv');
         $data = array_map('str_getcsv', file($file->getRealPath()));
-        $headers = array_shift($data);
 
-        // Convert array to collection for easier iteration
+        $headers = array_map(fn($h) => str_replace(' ', '_', strtolower(trim($h))), array_shift($data));
         $rows = collect($data);
+        $headerLine = implode(',', $headers);
 
-        // Helper to parse currency strings
-        $parseCurrency = function ($value) {
-            return (float) str_replace(["$", ","], "", $value);
-        };
+        if (str_contains($headerLine, 'proposal_name') || str_contains($headerLine, 'prospect_proposal_name')) {
+            $this->handleOpportunities($rows);
+        } elseif (str_contains($headerLine, 'action_system_record_id')) {
+            $this->handleActions($rows);
+        } else {
+            return redirect()->back()->with('error', 'Could not determine file type from headers.');
+        }
 
-        // More lenient date parser that skips invalid/empty fields
-        // Force parse date as DD/MM/YYYY
-        $parseDate = function ($dateString) {
-            $clean = trim($dateString);
-            if (!$clean) return null;
+        return redirect()->route('dashboard')->with('success', 'CSV uploaded and processed.');
+    }
 
-            try {
-                // This will parse day first, then month, then year
-                return \Carbon\Carbon::createFromFormat('d/m/Y', $clean);
-            } catch (\Exception $e) {
-                return null;
-            }
-        };
+    private function parseDate(?string $value): ?Carbon
+    {
+        $clean = trim($value ?? '');
+        if (!$clean) return null;
 
+        try {
+            return Carbon::createFromFormat('d/m/Y', $clean);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 
-        // Clear old data
+    private function parseCurrency(?string $value): float
+    {
+        return (float) str_replace(['$', ','], '', $value ?? '0');
+    }
+
+    private function handleOpportunities($rows): void
+    {
         Opportunity::truncate();
 
-        // Insert new rows
         foreach ($rows as $row) {
             Opportunity::create([
                 'constituent_id' => $row[0] ?? null,
@@ -63,20 +72,35 @@ class DataController extends Controller
                 'proposal_name' => $row[8] ?? null,
                 'fund' => $row[9] ?? null,
                 'purpose' => $row[10] ?? null,
-                'date_added' => $parseDate($row[11] ?? ''),
-                'target_ask' => $parseCurrency($row[12] ?? '0'),
-                'date_asked' => $parseDate($row[13] ?? ''),
-                'amount_expected' => $parseCurrency($row[14] ?? '0'),
-                'date_expected' => $parseDate($row[15] ?? ''),
-                'amount_funded' => $parseCurrency($row[16] ?? '0'),
-                'date_closed' => $parseDate($row[17] ?? ''),
-                'deadline' => $parseDate($row[18] ?? ''),
+                'date_added' => $this->parseDate($row[11] ?? ''),
+                'target_ask' => $this->parseCurrency($row[12] ?? '0'),
+                'date_asked' => $this->parseDate($row[13] ?? ''),
+                'amount_expected' => $this->parseCurrency($row[14] ?? '0'),
+                'date_expected' => $this->parseDate($row[15] ?? ''),
+                'amount_funded' => $this->parseCurrency($row[16] ?? '0'),
+                'date_closed' => $this->parseDate($row[17] ?? ''),
+                'deadline' => $this->parseDate($row[18] ?? ''),
                 'is_inactive' => strtolower(trim($row[19] ?? '')) === 'yes',
                 'record_id' => $row[20] ?? null,
             ]);
         }
+    }
 
-        // After storing, redirect back to the dashboard
-        return redirect()->route('dashboard');
+    private function handleActions($rows): void
+    {
+        Action::truncate();
+
+        foreach ($rows as $row) {
+            Action::create([
+                'action_system_record_id' => $row[0] ?? null,
+                'action_category' => $row[1] ?? null,
+                'action_completed_on' => $this->parseDate($row[2] ?? ''),
+                'action_solicitor_list' => $row[3] ?? null,
+                'action_type' => $row[4] ?? null,
+                'constituent_id' => $row[5] ?? null,
+                'name' => $row[6] ?? null,
+                'record_id' => $row[7] ?? null,
+            ]);
+        }
     }
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CSV Dashboard</title>
+    <title>Major Dashboard</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -80,6 +80,15 @@
                 Last 12 Months
                 </span>
                 <canvas id="solicitedFundedChart" height="100"></canvas>
+            </div>
+
+            <!-- Constituent Actions by Fundraiser -->
+            <div class="bg-white shadow rounded-lg p-4 col-span-2">
+                <h2 class="text-xl font-semibold mb-2">MG Calls & Meetings</h2>
+                <span class="text-xs bg-green-100 text-green-800 font-medium px-2 py-1 rounded-full">
+                    Current Fiscal Year
+                </span>
+                <canvas id="actionSummary" height="300"></canvas>
             </div>
         </div>
     </div>
@@ -372,6 +381,43 @@
             },
             plugins: [ChartDataLabels]
         });
+
+        const actionSummaryCtx = document.getElementById('actionSummary').getContext('2d');
+        const actionSummaryChart = new Chart(actionSummaryCtx, {
+            type: 'bar',
+            data: {
+                labels: @json($fundraiserLabels),
+                datasets: @json($fundraiserActionsChart)
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true }
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    datalabels: {
+                        color: '#fff',
+                        anchor: 'center',
+                        align: 'center',
+                        font: { weight: 'bold' },
+                        formatter: v => v,
+                        display: ctx => actionSummaryCtx.dataset.data[actionSummaryCtx.dataIndex] > 0
+                    }
+                },
+                onClick: function (e, elements) {
+                    if (!elements.length) return;
+                    const el = elements[0];
+                    const fundraiser = encodeURIComponent(this.data.labels[el.index]);
+                    const actionType = encodeURIComponent(this.data.datasets[el.datasetIndex].label);
+                    window.open(`/actions/${fundraiser}/${actionType}`, '_blank');
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
     </script>
 </body>
 </html>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Opportunity;
 use Carbon\Carbon;
+use App\Models\Action;
+use Illuminate\Support\Facades\DB;
 
 
 class DashboardController extends Controller
@@ -45,6 +47,35 @@ class DashboardController extends Controller
         $solicitedAskCount = Opportunity::proposalStatus('Solicited - Ask Made', $cutoff, $now)->count();
         $fundedClosedCount = Opportunity::fundedClosed($cutoff, $now)->count();
 
+        $actions = Action::select([
+                DB::raw("TRIM(action_solicitor_list) as fundraiser"),
+                'action_category',
+                DB::raw('COUNT(*) as total')
+            ])
+            ->whereNotNull('action_solicitor_list')
+            ->whereNotNull('action_category')
+            ->groupBy('fundraiser', 'action_category')
+            ->get()
+            ->groupBy('fundraiser');
+
+        $fundraisers = $actions->keys();
+        $categories = ['Email', 'Mailing', 'Meeting', 'Phone Call'];
+        
+        $fundraiserActionsChart = [];
+        foreach ($categories as $category) {
+            $fundraiserActionsChart[] = [
+                'label' => $category,
+                'data' => $fundraisers->map(fn($f) => $actions[$f]->firstWhere('action_category', $category)?->total ?? 0)->toArray(),
+                'backgroundColor' => match ($category) {
+                    'Email' => '#42A5F5',
+                    'Mailing' => '#FFCA28',
+                    'Meeting' => '#66BB6A',
+                    'Phone Call' => '#AB47BC',
+                    default => '#ccc'
+                }
+            ];
+        }
+            
         return view('dashboard', [
             'funnel'                => $funnel,
             'summaryLabels'         => $summaryLabels,
@@ -56,6 +87,8 @@ class DashboardController extends Controller
             'purposeCounts'         => $purposeCounts,
             'solicitedAskCount'     => $solicitedAskCount,
             'fundedClosedCount'     => $fundedClosedCount,
+            'fundraiserLabels'      => $fundraisers,
+            'fundraiserActionsChart' => $fundraiserActionsChart
         ]);
     }
 
