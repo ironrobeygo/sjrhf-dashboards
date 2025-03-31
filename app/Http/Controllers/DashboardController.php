@@ -90,19 +90,27 @@ class DashboardController extends Controller
         ->groupBy('fundraiser');
 
         $fundraisersByType = $actionTypes->keys();
+<<<<<<< HEAD
         $types = ['Card', 
             'Cultivation',
             'Follow Up',
             'Identification',
             'Information Requested',
             'Left a Voicemail',
+=======
+        $types = [
+            'Cultivation',
+>>>>>>> c7ba2e78cc58f6ccdc01fe27a367150ddacaa009
             'Meaningful Move',
             'Other',
             'Qualification',
             'Report Back',
             'Solicitation',
             'Stewardship',
+<<<<<<< HEAD
             'Tour'
+=======
+>>>>>>> c7ba2e78cc58f6ccdc01fe27a367150ddacaa009
         ];
         
         $fundraiserActionsByTypeChart = [];
@@ -111,19 +119,26 @@ class DashboardController extends Controller
                 'label' => $type,
                 'data' => $fundraisersByType->map(fn($f) => $actionTypes[$f]->firstWhere('action_type', $type)?->total ?? 0)->toArray(),
                 'backgroundColor' => match ($type) {
+<<<<<<< HEAD
                     'Card' => '#F06292',
                     'Cultivation' => '#BA68C8',
                     'Follow Up' => '#64B5F6',
                     'Identification' => '#4DB6AC',
                     'Information Requested' => '#FFD54F',
                     'Left a Voicemail' => '#90A4AE',
+=======
+                    'Cultivation' => '#BA68C8',
+>>>>>>> c7ba2e78cc58f6ccdc01fe27a367150ddacaa009
                     'Meaningful Move' => '#81C784',
                     'Other' => '#E0E0E0',
                     'Qualification' => '#7986CB',
                     'Report Back' => '#AED581',
                     'Solicitation' => '#FF8A65',
                     'Stewardship' => '#66BB6A',
+<<<<<<< HEAD
                     'Tour' => '#4DD0E1',
+=======
+>>>>>>> c7ba2e78cc58f6ccdc01fe27a367150ddacaa009
                     default => '#ccc'
                 }
             ];
