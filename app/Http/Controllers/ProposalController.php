@@ -46,6 +46,6 @@ class ProposalController extends Controller
 
         $title = "Active Proposals with Status: $status";
 
-        return view('opportunities.summary', compact('records', 'title'));
+        return view('proposal.summary', compact('records', 'title'));
     }
 }
