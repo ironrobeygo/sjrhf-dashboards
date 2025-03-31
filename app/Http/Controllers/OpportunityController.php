@@ -10,28 +10,27 @@ class OpportunityController extends Controller
 {
     public function type($type)
     {
-        $cutoff = Carbon::now()->subMonths(12);
-        $now = Carbon::now();
+        $last12Months = getLast12Months();
 
         // Determine which date column to use based on $type
         switch ($type) {
             case 'target':
                 $records = Opportunity::whereNotNull('date_asked')
-                    ->whereBetween('date_asked', [$cutoff, $now])
+                    ->whereBetween('date_asked', [$last12Months['cutoff'], $last12Months['now']])
                     ->get();
                 $title = 'Target Ask Opportunities';
                 break;
 
             case 'expected':
                 $records = Opportunity::whereNotNull('date_expected')
-                    ->whereBetween('date_expected', [$cutoff, $now])
+                    ->whereBetween('date_expected', [$last12Months['cutoff'], $last12Months['now']])
                     ->get();
                 $title = 'Expected Opportunities';
                 break;
 
             case 'funded':
                 $records = Opportunity::whereNotNull('date_closed')
-                    ->whereBetween('date_closed', [$cutoff, $now])
+                    ->whereBetween('date_closed', [$last12Months['cutoff'], $last12Months['now']])
                     ->get();
                 $title = 'Funded Opportunities';
                 break;
@@ -78,14 +77,13 @@ class OpportunityController extends Controller
 
     public function typeDetails($type)
     {
-        $cutoff = Carbon::now()->subMonths(12);
-        $now = Carbon::now();
+        $last12Months = getLast12Months();
 
         if ($type === 'solicited-ask-made') {
-            $opportunities = Opportunity::proposalStatus('Solicited - Ask Made', $cutoff, $now)->get();
+            $opportunities = Opportunity::proposalStatus('Solicited - Ask Made', $last12Months['cutoff'], $last12Months['now'])->get();
             $title = 'Solicited - Ask Made Opportunities (Last 12 Months)';
         } elseif ($type === 'funded-closed') {
-            $opportunities = Opportunity::fundedClosed($cutoff, $now)->get();
+            $opportunities = Opportunity::fundedClosed($last12Months['cutoff'], $last12Months['now'])->get();
             $title = 'Funded/Closed Opportunities (Last 12 Months)';
         } else {
             abort(404, 'Opportunity type not found.');
