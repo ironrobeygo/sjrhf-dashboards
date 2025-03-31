@@ -11,34 +11,34 @@ use App\Http\Controllers\ProposalController;
 use App\Models\User;
 use App\Http\Controllers\ActionController;
 
-// // Login route (required by auth middleware)
-// Route::get('/login', function () {
-//     return redirect()->route('auth.blackbaud');
-// })->name('login');
+// Login route (required by auth middleware)
+Route::get('/login', function () {
+    return redirect()->route('auth.blackbaud');
+})->name('login');
 
-// // Start Blackbaud OAuth
-// Route::get('/auth/blackbaud', function () {
-//     return Socialite::driver('blackbaud')->redirect();
-// })->name('auth.blackbaud');
+// Start Blackbaud OAuth
+Route::get('/auth/blackbaud', function () {
+    return Socialite::driver('blackbaud')->redirect();
+})->name('auth.blackbaud');
 
-// // OAuth callback
-// Route::get('/auth/blackbaud/callback', function () {
-//     $blackbaudUser = Socialite::driver('blackbaud')->stateless()->user();
+// OAuth callback
+Route::get('/auth/blackbaud/callback', function () {
+    $blackbaudUser = Socialite::driver('blackbaud')->stateless()->user();
 
-//     // Use token to create a dummy user
-//     $user = User::firstOrCreate([
-//         'email' => 'blackbaud_' . md5($blackbaudUser->token) . '@bb.fake',
-//     ], [
-//         'name' => 'Blackbaud User',
-//         'password' => bcrypt(Str::random(16)),
-//     ]);
+    // Use token to create a dummy user
+    $user = User::firstOrCreate([
+        'email' => 'blackbaud_' . md5($blackbaudUser->token) . '@bb.fake',
+    ], [
+        'name' => 'Blackbaud User',
+        'password' => bcrypt(Str::random(16)),
+    ]);
 
-//     Auth::login($user);
+    Auth::login($user);
 
-//     return redirect('/dashboard');
-// });
+    return redirect('/dashboard');
+});
 
-// Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/upload', [DataController::class, 'uploadForm'])->name('upload.form');
     Route::post('/upload', [DataController::class, 'upload'])->name('upload.store');
     
@@ -54,4 +54,4 @@ use App\Http\Controllers\ActionController;
     Route::get('/actions/{fundraiser}/{category}', [ActionController::class, 'showFundraiserActionDetails']);
     Route::get('/action-type/{fundraiser}/{type}', [ActionController::class, 'showFundraiserActionType']);
 
-// });
+});
