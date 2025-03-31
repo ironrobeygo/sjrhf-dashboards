@@ -22,3 +22,19 @@ if (! function_exists('getFiscalYearDates')) {
         ];
     }
 }
+
+if(! function_exists('getLast12Months')) {
+    /**
+     * Get the status of an opportunity based on its proposal status.
+     *
+     * @param string $status
+     * @return string|null
+     */
+    function getLast12Months()
+    {
+        return [
+            'cutoff' => \Carbon\Carbon::now()->subMonths(12),
+            'now' => \Carbon\Carbon::now()
+        ];
+    }
+}
