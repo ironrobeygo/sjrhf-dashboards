@@ -47,30 +47,83 @@ class DashboardController extends Controller
         $solicitedAskCount = Opportunity::proposalStatus('Solicited - Ask Made', $cutoff, $now)->count();
         $fundedClosedCount = Opportunity::fundedClosed($cutoff, $now)->count();
 
-        $actions = Action::select([
+        $actionCategories = Action::select([
                 DB::raw("TRIM(action_solicitor_list) as fundraiser"),
                 'action_category',
                 DB::raw('COUNT(*) as total')
             ])
+            ->whereBetween('action_completed_on', [$fiscalDates['start'], $fiscalDates['end']])
             ->whereNotNull('action_solicitor_list')
             ->whereNotNull('action_category')
             ->groupBy('fundraiser', 'action_category')
             ->get()
             ->groupBy('fundraiser');
 
-        $fundraisers = $actions->keys();
+        $fundraisersByCategory = $actionCategories->keys();
         $categories = ['Email', 'Mailing', 'Meeting', 'Phone Call'];
         
-        $fundraiserActionsChart = [];
+        $fundraiserActionsByCategoryChart = [];
         foreach ($categories as $category) {
-            $fundraiserActionsChart[] = [
+            $fundraiserActionsByCategoryChart[] = [
                 'label' => $category,
-                'data' => $fundraisers->map(fn($f) => $actions[$f]->firstWhere('action_category', $category)?->total ?? 0)->toArray(),
+                'data' => $fundraisersByCategory->map(fn($f) => $actionCategories[$f]->firstWhere('action_category', $category)?->total ?? 0)->toArray(),
                 'backgroundColor' => match ($category) {
                     'Email' => '#42A5F5',
                     'Mailing' => '#FFCA28',
                     'Meeting' => '#66BB6A',
                     'Phone Call' => '#AB47BC',
+                    default => '#ccc'
+                }
+            ];
+        }
+
+        $actionTypes = Action::select([
+            DB::raw("TRIM(action_solicitor_list) as fundraiser"),
+            'action_type',
+            DB::raw('COUNT(*) as total')
+        ])
+        ->whereBetween('action_completed_on', [$fiscalDates['start'], $fiscalDates['end']])
+        ->whereNotNull('action_solicitor_list')
+        ->whereNotNull('action_type')
+        ->groupBy('fundraiser', 'action_type')
+        ->get()
+        ->groupBy('fundraiser');
+
+        $fundraisersByType = $actionTypes->keys();
+        $types = ['Card', 
+            'Cultivation',
+            'Follow Up',
+            'Identification',
+            'Information Requested',
+            'Left a Voicemail',
+            'Meaningful Move',
+            'Other',
+            'Qualification',
+            'Report Back',
+            'Solicitation',
+            'Stewardship',
+            'Tour'
+        ];
+        
+        $fundraiserActionsByTypeChart = [];
+        foreach ($types as $type) {
+            $fundraiserActionsByTypeChart[] = [
+                'label' => $type,
+                'data' => $fundraisersByType->map(fn($f) => $actionTypes[$f]->firstWhere('action_type', $type)?->total ?? 0)->toArray(),
+                'backgroundColor' => match ($type) {
+                    'Card' => '#F06292',
+                    'Cultivation' => '#BA68C8',
+                    'Follow Up' => '#64B5F6',
+                    'Identification' => '#4DB6AC',
+                    'Information Requested' => '#FFD54F',
+                    'Left a Voicemail' => '#90A4AE',
+                    'Meaningful Move' => '#81C784',
+                    'Other' => '#E0E0E0',
+                    'Qualification' => '#7986CB',
+                    'Report Back' => '#AED581',
+                    'Solicitation' => '#FF8A65',
+                    'Stewardship' => '#66BB6A',
+                    'Tour' => '#4DD0E1',
                     default => '#ccc'
                 }
             ];
@@ -87,8 +140,10 @@ class DashboardController extends Controller
             'purposeCounts'         => $purposeCounts,
             'solicitedAskCount'     => $solicitedAskCount,
             'fundedClosedCount'     => $fundedClosedCount,
-            'fundraiserLabels'      => $fundraisers,
-            'fundraiserActionsChart' => $fundraiserActionsChart
+            'fundraiserCategoryLabels'      => $fundraisersByCategory,
+            'fundraiserActionCategoryChart' => $fundraiserActionsByCategoryChart,
+            'fundraiserTypeLabels'      => $fundraisersByType,
+            'fundraiserActionTypeChart' => $fundraiserActionsByTypeChart
         ]);
     }
 

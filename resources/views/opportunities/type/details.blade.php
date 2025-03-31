@@ -26,7 +26,7 @@
                         </thead>
                         <tbody class="text-gray-800 divide-y divide-gray-200">
                             @foreach($records as $op)
-                                <tr class="hover:bg-gray-50 transition">
+                            <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="window.open('https://host.nxt.blackbaud.com/constituent/records/{{ $op->record_id }}','_blank')">
                                     <td class="px-4 py-2 whitespace-nowrap">{{ $op->constituent_id }}</td>
                                     <td class="px-4 py-2 whitespace-nowrap">{{ $op->name ?? $op->organization_name }}</td>
                                     <td class="px-4 py-2 whitespace-nowrap">{{ $op->solicitors }}</td>

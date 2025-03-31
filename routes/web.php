@@ -9,6 +9,7 @@ use App\Http\Controllers\DataController;
 use App\Http\Controllers\OpportunityController;
 use App\Http\Controllers\ProposalController;
 use App\Models\User;
+use App\Http\Controllers\ActionController;
 
 // // Login route (required by auth middleware)
 // Route::get('/login', function () {
@@ -49,4 +50,8 @@ use App\Models\User;
     
     Route::get('/proposal-summary/{status}', [ProposalController::class, 'summary']);
     Route::get('/open-proposals/{group}', [ProposalController::class, 'details'])->name('open.proposals.details');
+
+    Route::get('/actions/{fundraiser}/{category}', [ActionController::class, 'showFundraiserActionDetails']);
+    Route::get('/action-type/{fundraiser}/{type}', [ActionController::class, 'showFundraiserActionType']);
+
 // });

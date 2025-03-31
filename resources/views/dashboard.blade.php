@@ -81,14 +81,24 @@
                 </span>
                 <canvas id="solicitedFundedChart" height="100"></canvas>
             </div>
-
+        </div>
+        <div class="mt-6">
             <!-- Constituent Actions by Fundraiser -->
-            <div class="bg-white shadow rounded-lg p-4 col-span-2">
-                <h2 class="text-xl font-semibold mb-2">MG Calls & Meetings</h2>
+            <div class="bg-white shadow rounded-lg p-4">
+                <h2 class="text-xl font-semibold mb-2">Action Category Summary by RM</h2>
                 <span class="text-xs bg-green-100 text-green-800 font-medium px-2 py-1 rounded-full">
                     Current Fiscal Year
                 </span>
-                <canvas id="actionSummary" height="300"></canvas>
+                <canvas id="actionSummary" height="100"></canvas>
+            </div>
+
+            <!-- Constituent Actions by Fundraiser -->
+            <div class="bg-white shadow rounded-lg p-4 mt-6">
+                <h2 class="text-xl font-semibold mb-2">Action Type Summary by RM</h2>
+                <span class="text-xs bg-green-100 text-green-800 font-medium px-2 py-1 rounded-full">
+                    Current Fiscal Year
+                </span>
+                <canvas id="actionTypeSummary" height="100"></canvas>
             </div>
         </div>
     </div>
@@ -186,8 +196,7 @@
             },
             plugins: [ChartDataLabels]
         });
-
-        
+       
         /**********
          * 2) Prospect Proposal Summary (Active)
          **********/
@@ -251,7 +260,7 @@
          * 3) Individuals vs Organizations (Open Proposals) Insight
          **********/
         const openProposalsCtx = document.getElementById('openProposalsChart').getContext('2d');
-        new Chart(openProposalsCtx, {
+        const openProposalsChart = new Chart(openProposalsCtx, {
             type: 'pie',
             data: {
                 labels: ['Individuals', 'Organizations'],
@@ -346,7 +355,7 @@
         const fundedCount = {{ $fundedClosedCount }};
 
         const solicitedFundedCtx = document.getElementById('solicitedFundedChart').getContext('2d');
-        new Chart(solicitedFundedCtx, {
+        const solicitedFundedChart = new Chart(solicitedFundedCtx, {
             type: 'pie',
             data: {
                 labels: ['Solicited - Ask Made', 'Funded/Closed'],
@@ -386,8 +395,8 @@
         const actionSummaryChart = new Chart(actionSummaryCtx, {
             type: 'bar',
             data: {
-                labels: @json($fundraiserLabels),
-                datasets: @json($fundraiserActionsChart)
+                labels: @json($fundraiserCategoryLabels),
+                datasets: @json($fundraiserActionCategoryChart)
             },
             options: {
                 indexAxis: 'y',
@@ -397,27 +406,66 @@
                     y: { stacked: true }
                 },
                 plugins: {
-                    legend: { position: 'bottom' },
+                    legend: {
+                        position: 'bottom'
+                    },
                     datalabels: {
                         color: '#fff',
                         anchor: 'center',
                         align: 'center',
                         font: { weight: 'bold' },
-                        formatter: v => v,
-                        display: ctx => actionSummaryCtx.dataset.data[actionSummaryCtx.dataIndex] > 0
+                        formatter: value => value,
+                        display: ctx => ctx.dataset.data[ctx.dataIndex] > 0
                     }
                 },
-                onClick: function (e, elements) {
+                onClick: (e, elements) => {
                     if (!elements.length) return;
                     const el = elements[0];
-                    const fundraiser = encodeURIComponent(this.data.labels[el.index]);
-                    const actionType = encodeURIComponent(this.data.datasets[el.datasetIndex].label);
-                    window.open(`/actions/${fundraiser}/${actionType}`, '_blank');
+                    const fundraiser = encodeURIComponent(actionSummaryChart.data.labels[el.index]);
+                    const actionType = encodeURIComponent(actionSummaryChart.data.datasets[el.datasetIndex].label);
+                    window.location.href = `/actions/${fundraiser}/${actionType}`;
                 }
             },
             plugins: [ChartDataLabels]
         });
 
+        const actionTypeSummaryCtx = document.getElementById('actionTypeSummary').getContext('2d');
+        const actionTypeSummaryChart = new Chart(actionTypeSummaryCtx, {
+            type: 'bar',
+            data: {
+                labels: @json($fundraiserTypeLabels),
+                datasets: @json($fundraiserActionTypeChart)
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        anchor: 'center',
+                        align: 'center',
+                        font: { weight: 'bold' },
+                        formatter: value => value,
+                        display: ctx => ctx.dataset.data[ctx.dataIndex] > 0
+                    }
+                },
+                onClick: (e, elements) => {
+                    if (!elements.length) return;
+                    const el = elements[0];
+                    const fundraiser = encodeURIComponent(actionTypeSummaryChart.data.labels[el.index]);
+                    const actionType = encodeURIComponent(actionTypeSummaryChart.data.datasets[el.datasetIndex].label);
+                    window.location.href = `/action-type/${fundraiser}/${actionType}`;
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
     </script>
 </body>
 </html>

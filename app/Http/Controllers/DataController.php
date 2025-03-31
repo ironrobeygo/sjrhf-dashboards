@@ -40,14 +40,17 @@ class DataController extends Controller
 
     private function parseDate(?string $value): ?Carbon
     {
+        
         $clean = trim($value ?? '');
         if (!$clean) return null;
 
-        try {
-            return Carbon::createFromFormat('d/m/Y', $clean);
-        } catch (\Exception $e) {
-            return null;
-        }
+        // return Carbon::createFromFormat('d/m/Y', $clean);
+        // dd($value);
+        // try {
+        //     return Carbon::createFromFormat('d/m/Y', $clean);
+        // } catch (\Exception $e) {
+        //     return null;
+        // }
     }
 
     private function parseCurrency(?string $value): float
@@ -72,14 +75,14 @@ class DataController extends Controller
                 'proposal_name' => $row[8] ?? null,
                 'fund' => $row[9] ?? null,
                 'purpose' => $row[10] ?? null,
-                'date_added' => $this->parseDate($row[11] ?? ''),
+                'date_added' => $row[11] ?? '',
                 'target_ask' => $this->parseCurrency($row[12] ?? '0'),
-                'date_asked' => $this->parseDate($row[13] ?? ''),
+                'date_asked' => $row[13] ?? '',
                 'amount_expected' => $this->parseCurrency($row[14] ?? '0'),
-                'date_expected' => $this->parseDate($row[15] ?? ''),
+                'date_expected' => $row[15] ?? '',
                 'amount_funded' => $this->parseCurrency($row[16] ?? '0'),
-                'date_closed' => $this->parseDate($row[17] ?? ''),
-                'deadline' => $this->parseDate($row[18] ?? ''),
+                'date_closed' => $row[17] ?? '',
+                'deadline' => $row[18] ?? '',
                 'is_inactive' => strtolower(trim($row[19] ?? '')) === 'yes',
                 'record_id' => $row[20] ?? null,
             ]);
@@ -90,17 +93,19 @@ class DataController extends Controller
     {
         Action::truncate();
 
-        foreach ($rows as $row) {
-            Action::create([
-                'action_system_record_id' => $row[0] ?? null,
-                'action_category' => $row[1] ?? null,
-                'action_completed_on' => $this->parseDate($row[2] ?? ''),
-                'action_solicitor_list' => $row[3] ?? null,
-                'action_type' => $row[4] ?? null,
-                'constituent_id' => $row[5] ?? null,
-                'name' => $row[6] ?? null,
-                'record_id' => $row[7] ?? null,
-            ]);
-        }
+        $rows->chunk(100)->each(function ($chunk) {
+            foreach ($chunk as $row) {
+                Action::create([
+                    'action_system_record_id' => $row[0] ?? null,
+                    'action_category' => $row[1] ?? null,
+                    'action_completed_on' => $row[2] ?? '',
+                    'action_solicitor_list' => $row[3] ?? null,
+                    'action_type' => $row[4] ?? null,
+                    'constituent_id' => $row[5] ?? null,
+                    'name' => $row[6] ?? null,
+                    'record_id' => $row[7] ?? null,
+                ]);
+            }
+        });
     }
 }
