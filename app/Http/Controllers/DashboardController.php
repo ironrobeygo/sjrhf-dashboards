@@ -90,19 +90,14 @@ class DashboardController extends Controller
         ->groupBy('fundraiser');
 
         $fundraisersByType = $actionTypes->keys();
-        $types = ['Card', 
+        $types = [
             'Cultivation',
-            'Follow Up',
-            'Identification',
-            'Information Requested',
-            'Left a Voicemail',
             'Meaningful Move',
             'Other',
             'Qualification',
             'Report Back',
             'Solicitation',
             'Stewardship',
-            'Tour'
         ];
         
         $fundraiserActionsByTypeChart = [];
@@ -111,19 +106,13 @@ class DashboardController extends Controller
                 'label' => $type,
                 'data' => $fundraisersByType->map(fn($f) => $actionTypes[$f]->firstWhere('action_type', $type)?->total ?? 0)->toArray(),
                 'backgroundColor' => match ($type) {
-                    'Card' => '#F06292',
                     'Cultivation' => '#BA68C8',
-                    'Follow Up' => '#64B5F6',
-                    'Identification' => '#4DB6AC',
-                    'Information Requested' => '#FFD54F',
-                    'Left a Voicemail' => '#90A4AE',
                     'Meaningful Move' => '#81C784',
                     'Other' => '#E0E0E0',
                     'Qualification' => '#7986CB',
                     'Report Back' => '#AED581',
                     'Solicitation' => '#FF8A65',
                     'Stewardship' => '#66BB6A',
-                    'Tour' => '#4DD0E1',
                     default => '#ccc'
                 }
             ];
