@@ -4,7 +4,7 @@
     <title>Funded Opportunities Details</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    @vite('resources/css/app.css')
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
     <div class="min-h-screen flex items-start justify-center px-4 py-10">
@@ -18,7 +18,7 @@
                 <p class="text-gray-600">No actions found.</p>
             @else
             <div class="bg-white rounded-lg shadow overflow-x-auto">
-                <table class="min-w-full text-sm text-left">
+                <table class="min-w-full text-xs text-left">
                     <thead class="bg-gray-100 text-xs text-gray-600 uppercase">
                         <tr>
                             <th class="py-3 px-4">Date</th>

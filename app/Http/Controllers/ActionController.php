@@ -3,34 +3,34 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Action;
+use App\Services\ActionService;
 
 class ActionController extends Controller
 {
+    protected $actionService;
+
+    public function __construct(ActionService $actionService)
+    {
+        $this->actionService = $actionService;
+    }
+
     public function showFundraiserActionDetails($fundraiser, $category)
     {
-        // Fetch actions based on the fundraiser and category
-        $actions = Action::where('action_solicitor_list', $fundraiser)
-            ->where('action_category', $category)
-            ->get();
-
+        $actions = $this->actionService->getActionsByCategory($fundraiser, $category);
         return view('actions.summary', [
-            'actions' => $actions,
+            'actions'    => $actions,
             'fundraiser' => $fundraiser,
-            'category' => $category
+            'category'   => $category
         ]);
     }
 
-    public function showFundraiserActionType($fundraiser, $type){
-        // Fetch actions based on the fundraiser and category
-        $actions = Action::where('action_solicitor_list', $fundraiser)
-            ->where('action_type', $type)
-            ->get();
-
+    public function showFundraiserActionType($fundraiser, $type)
+    {
+        $actions = $this->actionService->getActionsByType($fundraiser, $type);
         return view('actions.type', [
-            'actions' => $actions,
+            'actions'    => $actions,
             'fundraiser' => $fundraiser,
-            'type' => $type
+            'type'       => $type
         ]);
     }
 }

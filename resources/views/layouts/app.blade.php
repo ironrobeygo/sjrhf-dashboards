@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Upload Opportunities')</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    @vite('resources/css/app.css')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-50 text-gray-800 antialiased">
     @yield('content')
 </body>
 </html>

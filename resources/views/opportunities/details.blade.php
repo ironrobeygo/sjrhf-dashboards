@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ $title }}</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-<body class="bg-gray-50 text-gray-800 antialiased">
+@extends('layouts.app')
+
+@section('title', 'Open Opportunities')
+
+@section('content')
     <div class="min-h-screen flex items-start justify-center px-4 py-8">
         <div class="w-full max-w-6xl">
             <!-- Page Title -->
@@ -14,7 +10,7 @@
 
             @if($opportunities->count())
                 <div class="bg-white rounded-lg shadow overflow-x-auto">
-                    <table class="min-w-full text-sm text-left">
+                    <table class="min-w-full text-xs text-left">
                         <thead class="bg-gray-100 text-xs text-gray-600 uppercase">
                             <tr>
                                 <th class="px-4 py-3">Constituent ID</th>
@@ -22,6 +18,7 @@
                                 <th class="px-4 py-3">Proposal Name</th>
                                 <th class="px-4 py-3">Status</th>
                                 <th class="px-4 py-3 text-right">Amount</th>
+                                <th class="px-4 py-3 text-right">Date Closed</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-700 divide-y divide-gray-200">
@@ -38,11 +35,13 @@
                                             ${{ number_format($opportunity->target_ask, 2) }}
                                         @endif
                                     </td>
+                                    <td class="px-4 py-2 text-right">{{ $opportunity->date_closed }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+
             @else
                 <p class="text-gray-500">No opportunities found.</p>
             @endif
@@ -55,5 +54,4 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+@endsection

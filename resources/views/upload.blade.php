@@ -4,7 +4,7 @@
     <title>Upload CSV</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    @vite('resources/css/app.css')
 </head>
 <body class="bg-gray-100 text-gray-900 antialiased">
     <div class="min-h-screen flex items-center justify-center px-4 py-8">

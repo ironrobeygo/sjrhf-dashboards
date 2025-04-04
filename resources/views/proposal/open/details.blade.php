@@ -4,7 +4,7 @@
     <title>Open Proposals – {{ ucfirst($group) }}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    @vite('resources/css/app.css')
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
     <div class="min-h-screen flex items-start justify-center px-4 py-10">
@@ -14,7 +14,7 @@
 
             @if($proposals->count())
                 <div class="bg-white rounded-lg shadow overflow-x-auto">
-                    <table class="min-w-full text-sm text-left">
+                    <table class="min-w-full text-xs text-left">
                         <thead class="bg-gray-100 text-xs text-gray-600 uppercase">
                             <tr>
                                 <th class="px-4 py-3">Constituent ID</th>
@@ -34,6 +34,10 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+                <!-- Pagination Links -->
+                <div class="mt-4">
+                    {{ $opportunities->links() }}
                 </div>
             @else
                 <p class="text-gray-600 mt-4">No open proposals found for <strong>{{ ucfirst($group) }}</strong>.</p>

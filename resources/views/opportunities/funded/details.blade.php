@@ -4,7 +4,7 @@
     <title>Funded Opportunities Details</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    @vite('resources/css/app.css')
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
     <div class="min-h-screen flex items-start justify-center px-4 py-10">
@@ -17,7 +17,7 @@
 
             @if($fundedOpportunities->count())
                 <div class="bg-white rounded-lg shadow overflow-x-auto">
-                    <table class="min-w-full text-sm text-left">
+                    <table class="min-w-full text-xs text-left">
                         <thead class="bg-gray-100 text-xs text-gray-600 uppercase">
                             <tr>
                                 <th class="px-4 py-3">Constituent ID</th>
@@ -29,16 +29,26 @@
                         </thead>
                         <tbody class="text-gray-800 divide-y divide-gray-200">
                             @foreach($fundedOpportunities as $opportunity)
-                            <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="window.open('https://host.nxt.blackbaud.com/constituent/records/{{ $opportunity->record_id }}','_blank')">
+                                <tr class="hover:bg-gray-50 transition cursor-pointer"
+                                    onclick="window.open('https://host.nxt.blackbaud.com/constituent/records/{{ $opportunity->record_id }}','_blank')">
                                     <td class="px-4 py-2">{{ $opportunity->constituent_id }}</td>
                                     <td class="px-4 py-2">{{ $opportunity->name ?? $opportunity->organization_name }}</td>
                                     <td class="px-4 py-2">{{ $opportunity->proposal_name }}</td>
-                                    <td class="px-4 py-2">{{ \Carbon\Carbon::parse($opportunity->date_closed)->format('M d, Y') }}</td>
-                                    <td class="px-4 py-2 text-right">${{ number_format($opportunity->amount_funded, 2) }}</td>
+                                    <td class="px-4 py-2">
+                                        {{ \Carbon\Carbon::parse($opportunity->date_closed)->format('M d, Y') }}
+                                    </td>
+                                    <td class="px-4 py-2 text-right">
+                                        ${{ number_format($opportunity->amount_funded, 2) }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination Links -->
+                <div class="mt-4">
+                    {{ $fundedOpportunities->links() }}
                 </div>
             @else
                 <p class="text-gray-600">No funded opportunities found for this fiscal year.</p>
