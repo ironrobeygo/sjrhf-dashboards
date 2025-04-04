@@ -52,7 +52,6 @@ class DashboardController extends Controller
                 'action_category',
                 DB::raw('COUNT(*) as total')
             ])
-            ->whereBetween('action_completed_on', [$fiscalDates['start'], $fiscalDates['end']])
             ->whereNotNull('action_solicitor_list')
             ->whereNotNull('action_category')
             ->groupBy('fundraiser', 'action_category')
@@ -82,7 +81,6 @@ class DashboardController extends Controller
             'action_type',
             DB::raw('COUNT(*) as total')
         ])
-        ->whereBetween('action_completed_on', [$fiscalDates['start'], $fiscalDates['end']])
         ->whereNotNull('action_solicitor_list')
         ->whereNotNull('action_type')
         ->groupBy('fundraiser', 'action_type')
