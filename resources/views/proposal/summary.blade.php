@@ -45,7 +45,7 @@
                 </div>
                 <!-- Pagination Links -->
                 <div class="mt-4">
-                    {{ $op->links() }}
+                    {{ $records->links() }}
                 </div>
             @else
                 <p class="text-gray-600 mt-4">No records found.</p>

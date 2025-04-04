@@ -116,15 +116,15 @@ class OpportunityService
     /**
      * Get details for opportunity types that require special query logic.
      */
-    public function getTypeDetails(string $type): array
+    public function getTypeDetails(string $type, int $perPage = 15): array
     {
         $dates = $this->getLast12MonthsDates();
 
         if ($type === 'solicited-ask-made') {
-            $opportunities = Opportunity::proposalStatus('Solicited - Ask Made', $dates['cutoff'], $dates['now'])->get();
+            $opportunities = Opportunity::proposalStatus('Solicited - Ask Made', $dates['cutoff'], $dates['now'])->paginate($perPage);
             $title = 'Solicited - Ask Made Opportunities (Last 12 Months)';
         } elseif ($type === 'funded-closed') {
-            $opportunities = Opportunity::fundedClosed($dates['cutoff'], $dates['now'])->get();
+            $opportunities = Opportunity::fundedClosed($dates['cutoff'], $dates['now'])->paginate($perPage);
             $title = 'Funded/Closed Opportunities (Last 12 Months)';
         } else {
             abort(404, 'Opportunity type not found.');

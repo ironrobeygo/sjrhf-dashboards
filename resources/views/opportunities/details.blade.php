@@ -41,7 +41,10 @@
                         </tbody>
                     </table>
                 </div>
-
+                <!-- Pagination Links -->
+                <div class="mt-4">
+                    {{ $opportunities->links() }}
+                </div>
             @else
                 <p class="text-gray-500">No opportunities found.</p>
             @endif
